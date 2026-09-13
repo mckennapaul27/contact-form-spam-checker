@@ -102,11 +102,114 @@ Intent, not keywords.
 
 Only blocked submissions are written to MongoDB.
 
-## Next.js install
+## Add to a Next.js contact form
 
-Copy the kit in [examples/nextjs-plugin](examples/nextjs-plugin): env vars, `lib/check-contact-spam.ts`, and `components/SpamBlockedModal.tsx`. The site’s existing form and contact route stay; you only add a check before send and a modal on the client.
+The site’s existing form and `/api/contact` route stay. You copy two files, add three env vars, then add a few lines in the route and on the form.
 
-Same `SPAM_CHECKER_API_KEY` on every site. `SPAM_CHECKER_WEBSITE` is what shows up in the blocked log.
+Files to copy from [examples/nextjs-plugin](examples/nextjs-plugin):
+
+| Copy from | Paste into the client site |
+| --- | --- |
+| `examples/nextjs-plugin/lib/check-contact-spam.ts` | `lib/check-contact-spam.ts` |
+| `examples/nextjs-plugin/components/SpamBlockedModal.tsx` | `components/SpamBlockedModal.tsx` |
+
+A full form example (react-hook-form + toast + recaptcha) is in [contact-form.tsx](contact-form.tsx).
+
+### 1. Env on the client site
+
+Add these to Vercel (or `.env.local`). Never expose the API key to the browser — only the contact **route** uses it.
+
+```
+SPAM_CHECKER_URL=https://bunker-spam-checker-0d34055e5302.herokuapp.com
+SPAM_CHECKER_API_KEY=
+SPAM_CHECKER_WEBSITE=https://this-client-site.co.uk
+```
+
+- Same `SPAM_CHECKER_API_KEY` on every site (the shared `API_KEY` from this service).
+- `SPAM_CHECKER_WEBSITE` is **this** site’s public URL. That is what appears in the blocked log.
+- Redeploy after adding env vars.
+
+### 2. Contact API route (server)
+
+In `app/api/contact/route.ts` (or whichever route the form posts to), call the checker **after** you have parsed `name` / `email` / `phone` / `message`, and **before** email or CRM.
+
+```ts
+import { blockedResponse, checkContactSpam } from "@/lib/check-contact-spam";
+
+export async function POST(request: Request) {
+  const { name, email, phone, message } = await request.json();
+
+  // existing validation / recaptcha stays here
+
+  const check = await checkContactSpam({ name, email, phone, message });
+  if (check.blocked) return blockedResponse(check.reason);
+
+  // existing email / CRM send continues here
+  return Response.json({ ok: true });
+}
+```
+
+`blockedResponse` returns HTTP 400 with `{ ok: false, blocked: true, reason }`. The form modal reads `reason`.
+
+If the checker is down or rate-limited, `checkContactSpam` fail-opens (`blocked: false`) so real enquiries still send.
+
+### 3. Contact form (client)
+
+In the form component that `fetch`es `/api/contact`:
+
+```tsx
+import {
+  showIfBlocked,
+  SpamBlockedModal,
+  useSpamBlockedModal,
+} from "@/components/SpamBlockedModal";
+
+export default function ContactForm() {
+  const blocked = useSpamBlockedModal();
+
+  async function onSubmit(values) {
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+
+    const data = await res.json();
+    if (showIfBlocked(data, blocked.show)) return;
+
+    if (!res.ok) {
+      // existing error handling (toast, etc.)
+      return;
+    }
+
+    // existing success handling
+  }
+
+  return (
+    <>
+      <form onSubmit={/* existing submit */}>{/* existing fields */}</form>
+      <SpamBlockedModal
+        open={blocked.open}
+        message={blocked.message}
+        onClose={blocked.close}
+      />
+    </>
+  );
+}
+```
+
+Check `showIfBlocked` **before** treating `!res.ok` as a generic error. A blocked submission is a 400; without that check the visitor gets a toast instead of the modal.
+
+The modal is self-contained Tailwind (slate / amber). It does not use the site theme, so it looks the same on every install.
+
+### Checklist
+
+1. Copy the two files into the site.
+2. Set the three env vars and redeploy.
+3. Add the two lines in the contact route before send.
+4. Add the hook, `showIfBlocked`, and `<SpamBlockedModal />` on the form.
+5. Submit a marketing/SEO pitch — you should see the modal, not a success toast.
+6. Submit a real customer message — it should still send as before.
 
 ## Later (not V1)
 
