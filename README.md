@@ -104,34 +104,10 @@ Only blocked submissions are written to MongoDB.
 
 ## Next.js install
 
-Every client site: add env vars, paste the helper into `app/api/contact/route.ts`, gate the existing send.
-
-Client site env (Vercel):
-
-```
-SPAM_CHECKER_URL=https://your-checker.example.com
-SPAM_CHECKER_API_KEY=the-shared-key
-SPAM_CHECKER_WEBSITE=https://this-client-site.co.uk
-```
-
-See [examples/nextjs-contact-route.ts](examples/nextjs-contact-route.ts) for the copy-paste helper. Call it from the **server** route only — never from the browser.
-
-```ts
-const check = await isSpamSubmission({ name, email, phone, message });
-if (check.blocked) {
-  return Response.json(
-    { error: check.reason ?? "Submission rejected" },
-    { status: 400 },
-  );
-}
-// existing email / CRM send continues here
-```
-
-If the fetch throws or the checker returns a non-OK status, treat as not spam and send as usual.
+Copy the kit in [examples/nextjs-plugin](examples/nextjs-plugin): env vars, `lib/check-contact-spam.ts`, and `components/SpamBlockedModal.tsx`. The site’s existing form and contact route stay; you only add a check before send and a modal on the client.
 
 Same `SPAM_CHECKER_API_KEY` on every site. `SPAM_CHECKER_WEBSITE` is what shows up in the blocked log.
 
 ## Later (not V1)
 
 Per-site API keys, extra block categories (e.g. job enquiries), and an admin UI.
-# contact-form-spam-checker
