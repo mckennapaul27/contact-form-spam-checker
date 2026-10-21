@@ -5,6 +5,7 @@ import { FIELD_LIMITS } from "../limits.js";
 import type { SpamCategory } from "../models/BlockedSubmission.js";
 import { spamCategories } from "../models/BlockedSubmission.js";
 import { buildClassificationPrompt, SPAM_INSTRUCTIONS } from "../prompts/spam.js";
+import { scanSubmissionLinks } from "./linkScan.js";
 
 const DEFAULT_BLOCK_REASON =
   "We couldn't accept this message because it looks like an unsolicited offer of marketing, SEO, or web design services. This contact form is for customers who want to use this business's own services. If that's you, please send a new message describing what you need help with.";
@@ -38,6 +39,15 @@ export type ClassificationResult = {
 export async function classifySubmission(
   input: CheckInput,
 ): Promise<ClassificationResult> {
+  const linkHit = scanSubmissionLinks(input);
+  if (linkHit) {
+    return {
+      blocked: true,
+      category: linkHit.category,
+      reason: clipReason(linkHit.reason),
+    };
+  }
+
   try {
     const { output } = await generateText({
       model: config.aiModel,

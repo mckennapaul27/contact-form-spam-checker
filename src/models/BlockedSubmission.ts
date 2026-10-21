@@ -1,6 +1,11 @@
 import mongoose, { Schema } from "mongoose";
 
-export const spamCategories = ["marketing", "seo", "web_design"] as const;
+export const spamCategories = [
+  "marketing",
+  "seo",
+  "web_design",
+  "suspicious_link",
+] as const;
 export type SpamCategory = (typeof spamCategories)[number];
 
 const blockedSubmissionSchema = new Schema(

@@ -68,10 +68,12 @@ When blocked:
 ```json
 {
   "blocked": true,
-  "category": "seo",
-  "reason": "We couldn't accept this message because it looks like an unsolicited SEO or backlink sales pitch. This contact form is for customers of this business, not for agencies offering digital marketing services. If you are looking to hire this company, please rewrite your message to explain what you need help with."
+  "category": "suspicious_link",
+  "reason": "We couldn't accept this message because it includes a link that doesn't look like a genuine customer enquiry. This contact form is for people who want to use this business's services. If that's you, please send a new message describing what you need, without promotional or unusual links."
 }
 ```
+
+`category` is one of `marketing`, `seo`, `web_design`, or `suspicious_link`.
 
 `reason` is visitor-facing copy for the contact-form UI (2–4 sentences: what was rejected, why, and that the form is for customers). Show it as-is.
 
@@ -96,9 +98,11 @@ Newest first. Returns `{ items, page, limit, total }`.
 
 Intent, not keywords.
 
-**Blocked:** people offering marketing, lead-gen, SEO, backlinks/guest posts, or web design/redesign to the site owner (including “free website suggestions” and DA/DR lists).
+**Blocked:**
+- Unsolicited offers of marketing, lead-gen, SEO, backlinks/guest posts, or web design/redesign (including “free website suggestions” and DA/DR lists).
+- Suspicious or promotional links: raw IP addresses (`http://18.133.117.243/`), URL shorteners, punycode hosts, junk TLDs, obfuscated URLs (`hxxp`, `[.]`), or several unrelated links. High-confidence link hits are blocked in code before the model runs.
 
-**Allowed:** genuine customers asking for that business’s own services. A shop asking a marketing agency for SEO is a lead. An SEO specialist pitching a plumber is spam.
+**Allowed:** genuine customers asking for that business’s own services. A shop asking a marketing agency for SEO is a lead. An SEO specialist pitching a plumber is spam. One normal company site, Google Maps, or social profile in a real enquiry is allowed.
 
 Only blocked submissions are written to MongoDB.
 
