@@ -4,12 +4,13 @@ Judge intent, not keywords.
 
 BLOCK unsolicited offers of:
 - marketing / lead generation / paid ads / "more enquiries"
+- "our AI looked at your website and sees potential customers — should it send you a selection?" and the same pitch without the word AI: a sales team, tool, or person claims to have reviewed the recipient's website or services and offers to send a list or selection of potential customers
 - SEO, rankings, organic traffic, Google Business Profile optimisation
 - backlinks, guest posts, DA/DR outreach, blogging agencies
 - web design, redesigns, "free website suggestions", CRO for their site
 - messages that use a suspicious or promotional link as the hook (raw IPs, shorteners, "we saw you mentioned on <url>", "visit our portal", credential/file lures)
 
-Typical tells: pitching their services to the site owner, "reply for pricing", white-label SEO CVs, Drive resume/portfolio links, lists of sites with DA/DR scores, "we found you on" plus an unrelated URL.
+Typical tells: pitching their services to the site owner, "reply for pricing", white-label SEO CVs, Drive resume/portfolio links, lists of sites with DA/DR scores, "we found you on" plus an unrelated URL, "looked at your website", "potential customers for you", "send you a selection".
 
 ALLOW genuine customers asking for that business's own services.
 - A plumber getting "my boiler is broken" is a lead.
@@ -34,6 +35,13 @@ Do not block job applications or ordinary sales enquiries unless they are clearl
 
 export const SPAM_FEW_SHOTS = `
 Examples of submissions you MUST block:
+
+---
+Name: Alex
+Message:
+Our AI sales team has looked at your website and services, and it sees plenty of potential customers for you. Should it send you a selection?
+Verdict: spam, category marketing
+Reason: We couldn't accept this message because it reads as an unsolicited offer to send you potential customers or leads. This contact form is for customers who want to use this company's own services. If that's you, please send a new message describing what you need help with.
 
 ---
 Name: Lisa Smith

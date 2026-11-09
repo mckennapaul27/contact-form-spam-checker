@@ -106,3 +106,5 @@ https://cryptodaily.co.uk/ DA 54 DR71
 https://retailtimes.co.uk/ DA 56 DR75
 
 --
+
+Our AI sales team has looked at Blue Gap Air's website and services, and it sees plenty of potential customers for you. Should it send you a selection? Alex, Dealmaikers

@@ -100,6 +100,7 @@ Intent, not keywords.
 
 **Blocked:**
 - Unsolicited offers of marketing, lead-gen, SEO, backlinks/guest posts, or web design/redesign (including “free website suggestions” and DA/DR lists).
+- Cold pitches that claim an AI, sales team, or tool reviewed the recipient’s website and offer to send a selection of potential customers.
 - Suspicious or promotional links: raw IP addresses (`http://18.133.117.243/`), URL shorteners, punycode hosts, junk TLDs, obfuscated URLs (`hxxp`, `[.]`), or several unrelated links. High-confidence link hits are blocked in code before the model runs.
 
 **Allowed:** genuine customers asking for that business’s own services. A shop asking a marketing agency for SEO is a lead. An SEO specialist pitching a plumber is spam. One normal company site, Google Maps, or social profile in a real enquiry is allowed.
